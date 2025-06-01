@@ -1,0 +1,781 @@
+
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feroz Ferramentas - Equipamentos e Acessórios Automotivos</title>
+	<link rel="icon" href="favicon.png" type="image/png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'feroz-dark': '#1A1A1A',
+                        'feroz-yellow': '#FFD100',
+                        'feroz-red': '#E63946',
+                        'feroz-gray': '#333333',
+                        'feroz-light': '#F5F5F5',
+                    },
+                    fontFamily: {
+                        'industrial': ['Oswald', 'sans-serif'],
+                        'body': ['Roboto', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap');
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f5f5f5;
+            scroll-behavior: smooth;
+        }
+        
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        .title-font {
+            font-family: 'Oswald', sans-serif;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        
+        .category-btn.active {
+            background-color: #FFD100;
+            color: #1A1A1A;
+            font-weight: 600;
+        }
+        
+        .marketplace-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: white;
+            z-index: 10;
+        }
+        
+        .marketplace-shopee {
+            background-color: #EE4D2D;
+        }
+        
+        .marketplace-mercadolivre {
+            background-color: #FFE600;
+            color: #333333;
+        }
+        
+        .marketplace-amazon {
+            background-color: #232F3E;
+        }
+        
+        .marketplace-aliexpress {
+            background-color: #E62E04;
+        }
+        
+        .marketplace-magalu {
+            background-color: #0086FF;
+        }
+        
+        .marketplace-temu {
+            background-color: #FF4B4B;
+        }
+        
+        .product-image-container {
+            position: relative;
+            width: 100%;
+            padding-bottom: 100%; /* 1:1 Aspect Ratio */
+            overflow: hidden;
+            cursor: pointer;
+        }
+        
+        .product-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f5f5f5;
+        }
+        
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        /* Modal styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal-content {
+            background-color: white;
+            border-radius: 0.5rem;
+            width: 90%;
+            max-width: 500px;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+            overflow: hidden;
+        }
+        
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+        
+        .product-card-content {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        
+        .product-info {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .product-actions {
+            margin-top: auto;
+        }
+        
+        .product-id {
+            text-align: center;
+            margin-bottom: 0.75rem;
+        }
+        
+        /* Info modal styles */
+        .info-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        
+        .info-modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .info-modal-content {
+            background-color: white;
+            border-radius: 0.5rem;
+            width: 90%;
+            max-width: 700px;
+            max-height: 80vh;
+            overflow-y: auto;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+            position: relative;
+        }
+        
+        .info-modal-overlay.active .info-modal-content {
+            transform: scale(1);
+        }
+        
+        .info-modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background-color: rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            width: 2rem;
+            height: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        
+        .info-modal-close:hover {
+            background-color: rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="bg-feroz-dark shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-3 flex flex-col md:flex-row items-center justify-between">
+            <div class="flex items-center mb-3 md:mb-0">
+                <div class="flex items-center">
+                    <i class="fas fa-tools text-feroz-yellow text-3xl mr-3"></i>
+                    <h1 class="text-white text-2xl font-bold title-font">FEROZ FERRAMENTAS</h1>
+                </div>
+            </div>
+            
+            <!-- Search Bar -->
+            <div class="w-full md:w-1/2 relative">
+                <input type="text" id="search-input" placeholder="Buscar ferramentas, acessórios..." 
+                    class="w-full py-2 px-4 rounded-lg border-2 border-feroz-gray focus:border-feroz-yellow focus:outline-none">
+                <button id="search-button" class="absolute right-2 top-1/2 transform -translate-y-1/2 text-feroz-gray hover:text-feroz-yellow">
+                    <i class="fas fa-search text-lg"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Banner -->
+    <section class="bg-gradient-to-r from-feroz-dark to-feroz-gray py-16 md:py-24">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-3xl md:text-5xl font-bold text-white title-font leading-tight mb-4">
+                Equipamentos <span class="text-feroz-yellow">imbatíveis</span>, com preços <span class="text-feroz-red">ferozes</span>
+            </h2>
+            <p class="text-feroz-light text-lg mb-8 max-w-2xl mx-auto">
+                Ferramentas profissionais para quem não aceita menos que o melhor. Confira agora!
+            </p>
+            <button id="ver-ofertas-btn" class="bg-feroz-yellow hover:bg-yellow-500 text-feroz-dark font-bold py-3 px-8 rounded-lg shadow-lg transition duration-300 flex items-center mx-auto">
+                <i class="fas fa-bolt mr-2"></i> VER OFERTAS
+            </button>
+        </div>
+    </section>
+
+    <!-- Categories Section -->
+    <section class="py-8 bg-white shadow-md">
+        <div class="container mx-auto px-4">
+            <h3 class="text-xl font-bold mb-4 title-font text-feroz-dark">CATEGORIAS</h3>
+            <div class="flex flex-wrap gap-2 md:gap-4">
+                <button class="category-btn active px-4 py-2 rounded-lg bg-gray-200 hover:bg-feroz-yellow transition duration-300 text-sm md:text-base" data-category="all">
+                    <i class="fas fa-border-all mr-1"></i> Todos
+                </button>
+                <button class="category-btn px-4 py-2 rounded-lg bg-gray-200 hover:bg-feroz-yellow transition duration-300 text-sm md:text-base" data-category="ferramentas">
+                    <i class="fas fa-wrench mr-1"></i> Ferramentas
+                </button>
+                <button class="category-btn px-4 py-2 rounded-lg bg-gray-200 hover:bg-feroz-yellow transition duration-300 text-sm md:text-base" data-category="lubrificantes">
+                    <i class="fas fa-oil-can mr-1"></i> Lubrificantes
+                </button>
+                <button class="category-btn px-4 py-2 rounded-lg bg-gray-200 hover:bg-feroz-yellow transition duration-300 text-sm md:text-base" data-category="limpeza">
+                    <i class="fas fa-spray-can mr-1"></i> Limpeza Automotiva
+                </button>
+                <button class="category-btn px-4 py-2 rounded-lg bg-gray-200 hover:bg-feroz-yellow transition duration-300 text-sm md:text-base" data-category="acessorios">
+                    <i class="fas fa-car-alt mr-1"></i> Acessórios Automotivos
+                </button>
+                <button class="category-btn px-4 py-2 rounded-lg bg-gray-200 hover:bg-feroz-yellow transition duration-300 text-sm md:text-base" data-category="organizacao">
+                    <i class="fas fa-boxes mr-1"></i> Organização de Materiais
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Products Grid -->
+    <section id="produtos-section" class="py-10 bg-gray-100">
+        <div class="container mx-auto px-4">
+            <h2 class="text-2xl md:text-3xl font-bold mb-8 title-font text-feroz-dark border-b-4 border-feroz-yellow inline-block pb-2">
+                OFERTAS IMPERDÍVEIS
+            </h2>
+            
+            <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                <!-- Products will be dynamically inserted here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Modal for product expansion -->
+    <div id="product-modal" class="modal-overlay" onclick="closeModal(event)">
+        <div class="modal-content">
+            <!-- Modal content will be dynamically inserted here -->
+        </div>
+    </div>
+
+    <!-- Info Modals -->
+    <!-- Sobre Nós Modal -->
+    <div id="sobre-nos-modal" class="info-modal-overlay">
+        <div class="info-modal-content">
+            <div class="info-modal-close" onclick="closeInfoModal('sobre-nos-modal')">
+                <i class="fas fa-times"></i>
+            </div>
+            <div class="p-6">
+                <h2 class="text-2xl font-bold title-font text-feroz-dark mb-4 border-b-2 border-feroz-yellow pb-2">Sobre Nós</h2>
+                <div class="space-y-4 text-gray-700">
+                    <p>Feroz Ferramentas nasceu com a missão de conectar você às melhores ofertas em ferramentas, acessórios automotivos e produtos de manutenção — tudo com praticidade, confiança e custo-benefício real.</p>
+                    
+                    <p>Somos um portal afiliado a marketplaces. Especializado em garimpar os itens mais úteis e relevantes para quem leva a manutenção a sério, seja profissional ou apaixonado por cuidar do próprio carro.</p>
+                    
+                    <p>Aqui, você encontra produtos selecionados com foco em qualidade, eficiência e preço justo — sempre com links diretos para compra segura na Shopee. Nosso compromisso é facilitar sua escolha com curadoria feroz e atualizações constantes.</p>
+                    
+                    <p class="font-bold">Ferramentas certas. Preços ferozes. A força que você procura está aqui.</p>
+                    
+                    <h3 class="text-xl font-bold title-font text-feroz-dark mt-8 mb-3">Isenção de Responsabilidade</h3>
+                    
+                    <p>O site Feroz Ferramentas atua como divulgador de produtos afiliados, apresentando ofertas de ferramentas, itens automotivos, acessórios e equipamentos de diversos marketplaces parceiros. Ao clicar em um link e realizar uma compra, podemos receber uma comissão pela indicação, sem custo adicional para você.</p>
+                    
+                    <p class="font-medium">É importante destacar que:</p>
+                    
+                    <ul class="list-disc pl-5 space-y-2">
+                        <li>Não realizamos a venda direta de nenhum produto. Todas as compras são feitas diretamente nos sites dos marketplaces parceiros.</li>
+                        
+                        <li>Toda a responsabilidade por pagamento, entrega, garantia, suporte técnico ou atendimento ao cliente é exclusiva da loja onde a compra foi realizada.</li>
+                        
+                        <li>As informações como descrição de produtos, preços, disponibilidade e prazos são fornecidas pelas próprias plataformas e podem ser alteradas sem aviso prévio.</li>
+                        
+                        <li>Não nos responsabilizamos por eventuais divergências, atrasos, defeitos ou problemas na experiência de compra nos sites de terceiros.</li>
+                        
+                        <li>Nosso compromisso é com a curadoria e recomendação de produtos confiáveis dentro do nosso nicho, com base em critérios como relevância, utilidade e custo-benefício.</li>
+                    </ul>
+                    
+                    <p>Para qualquer dúvida relacionada à compra, entre em contato diretamente com o atendimento do marketplace onde o pedido foi efetuado.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contato Modal -->
+    <div id="contato-modal" class="info-modal-overlay">
+        <div class="info-modal-content">
+            <div class="info-modal-close" onclick="closeInfoModal('contato-modal')">
+                <i class="fas fa-times"></i>
+            </div>
+            <div class="p-6">
+                <h2 class="text-2xl font-bold title-font text-feroz-dark mb-6 border-b-2 border-feroz-yellow pb-2">Contato</h2>
+                <div class="space-y-6 text-center">
+                    <div class="flex items-center justify-center space-x-3 text-xl">
+                        <i class="fab fa-instagram text-2xl text-pink-600"></i>
+                        <span class="font-medium">@ferozferramentas</span>
+                    </div>
+                    <div class="flex items-center justify-center space-x-3 text-xl">
+                        <i class="far fa-envelope text-2xl text-feroz-dark"></i>
+                        <span class="font-medium">cttferozferramentas@gmail.com</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Termos de Uso Modal -->
+    <div id="termos-uso-modal" class="info-modal-overlay">
+        <div class="info-modal-content">
+            <div class="info-modal-close" onclick="closeInfoModal('termos-uso-modal')">
+                <i class="fas fa-times"></i>
+            </div>
+            <div class="p-6">
+                <h2 class="text-2xl font-bold title-font text-feroz-dark mb-4 border-b-2 border-feroz-yellow pb-2">Termos de Uso</h2>
+                <div class="space-y-4 text-gray-700">
+                    <div class="mb-4">
+                        <h3 class="text-lg font-bold">1. Aceitação dos termos</h3>
+                        <p>Ao acessar e utilizar o site Feroz Ferramentas, você concorda com os presentes termos de uso e com a política de privacidade.</p>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h3 class="text-lg font-bold">2. Conteúdo do site</h3>
+                        <p>O site oferece recomendações de produtos e links afiliados. Não garantimos a disponibilidade, qualidade ou entrega dos produtos indicados, sendo responsabilidade do usuário verificar as condições nos sites de terceiros.</p>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h3 class="text-lg font-bold">3. Propriedade intelectual</h3>
+                        <p>Todo o conteúdo do site, incluindo textos, imagens e logotipos, é protegido por direitos autorais e não pode ser reproduzido sem autorização prévia.</p>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h3 class="text-lg font-bold">4. Responsabilidades</h3>
+                        <p>Não nos responsabilizamos por:</p>
+                        <ul class="list-disc pl-5 space-y-1 mt-2">
+                            <li>Conteúdo de sites de terceiros acessados por meio de links;</li>
+                            <li>Eventuais danos decorrentes do uso do site ou de produtos adquiridos por meio de links afiliados;</li>
+                            <li>Informações incorretas ou desatualizadas fornecidas por parceiros comerciais.</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h3 class="text-lg font-bold">5. Modificações nos termos</h3>
+                        <p>Reservamo-nos o direito de alterar estes termos de uso a qualquer momento. As alterações entrarão em vigor imediatamente após a publicação no site.</p>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h3 class="text-lg font-bold">6. Contato</h3>
+                        <p>Para dúvidas ou informações adicionais, entre em contato pelo e-mail: cttferozferramentas@gmail.com.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Política de Privacidade Modal -->
+    <div id="privacidade-modal" class="info-modal-overlay">
+        <div class="info-modal-content">
+            <div class="info-modal-close" onclick="closeInfoModal('privacidade-modal')">
+                <i class="fas fa-times"></i>
+            </div>
+            <div class="p-6">
+                <h2 class="text-2xl font-bold title-font text-feroz-dark mb-4 border-b-2 border-feroz-yellow pb-2">Política de Privacidade</h2>
+                <div class="space-y-4 text-gray-700">
+                    <p>A sua privacidade é importante para nós. É política do Feroz Ferramentas respeitar a sua privacidade em relação a qualquer informação sua que possamos coletar no site Feroz Ferramentas, e outros sites que possuímos e operamos.</p>
+                    
+                    <p>Solicitamos informações pessoais apenas quando realmente precisamos delas para lhe fornecer um serviço. Fazemo-lo por meios justos e legais, com o seu conhecimento e consentimento. Também informamos por que estamos coletando e como será usado.</p>
+                    
+                    <p>Apenas retemos as informações coletadas pelo tempo necessário para fornecer o serviço solicitado. Quando armazenamos dados, protegemos dentro de meios comercialmente aceitáveis para evitar perdas e roubos, bem como acesso, divulgação, cópia, uso ou modificação não autorizados.</p>
+                    
+                    <p>Não compartilhamos informações de identificação pessoal publicamente ou com terceiros, exceto quando exigido por lei.</p>
+                    
+                    <p>O nosso site pode ter links para sites externos que não são operados por nós. Esteja ciente de que não temos controle sobre o conteúdo e práticas desses sites e não podemos aceitar responsabilidade por suas respectivas políticas de privacidade.</p>
+                    
+                    <p>Você é livre para recusar a nossa solicitação de informações pessoais, entendendo que talvez não possamos fornecer alguns dos serviços desejados.</p>
+                    
+                    <p>O uso continuado de nosso site será considerado como aceitação de nossas práticas em torno de privacidade e informações pessoais. Se você tiver alguma dúvida sobre como lidamos com dados do usuário e informações pessoais, entre em contato conosco.</p>
+                    
+                    <h3 class="text-xl font-bold title-font text-feroz-dark mt-6 mb-3">Publicidade</h3>
+                    
+                    <p>O serviço Google AdSense que usamos para veicular publicidade usa um cookie DoubleClick para veicular anúncios mais relevantes em toda a Web e limitar o número de vezes que um determinado anúncio é exibido para você.</p>
+                    
+                    <p>Para mais informações sobre o Google AdSense, consulte as FAQs oficiais sobre privacidade do Google AdSense.</p>
+                    
+                    <p>Utilizamos anúncios para compensar os custos de funcionamento deste site e fornecer financiamento para futuros desenvolvimentos. Os cookies de publicidade comportamental usados por este site foram projetados para garantir que você forneça os anúncios mais relevantes sempre que possível, rastreando anonimamente seus interesses e apresentando coisas semelhantes que possam ser do seu interesse.</p>
+                    
+                    <p>Vários parceiros anunciam em nosso nome e os cookies de rastreamento de afiliados simplesmente nos permitem ver se nossos clientes acessaram o site através de um dos sites de nossos parceiros, para que possamos creditá-los adequadamente e, quando aplicável, permitir que nossos parceiros afiliados ofereçam qualquer promoção que pode fornecê-lo para fazer uma compra.</p>
+                    
+                    <h3 class="text-xl font-bold title-font text-feroz-dark mt-6 mb-3">Compromisso do Usuário</h3>
+                    
+                    <p>O usuário se compromete a fazer uso adequado dos conteúdos e da informação que o Feroz Ferramentas oferece no site e com caráter enunciativo, mas não limitativo:</p>
+                    
+                    <ul class="list-disc pl-5 space-y-2 mt-2">
+                        <li>A) Não se envolver em atividades que sejam ilegais ou contrárias à boa fé a à ordem pública;</li>
+                        <li>B) Não difundir propaganda ou conteúdo de natureza racista, xenofóbica, jogos de sorte ou azar, qualquer tipo de pornografia ilegal, de apologia ao terrorismo ou contra os direitos humanos;</li>
+                        <li>C) Não causar danos aos sistemas físicos (hardwares) e lógicos (softwares) do Feroz Ferramentas, de seus fornecedores ou terceiros, para introduzir ou disseminar vírus informáticos ou quaisquer outros sistemas de hardware ou software que sejam capazes de causar danos anteriormente mencionados.</li>
+                    </ul>
+                    
+                    <h3 class="text-xl font-bold title-font text-feroz-dark mt-6 mb-3">Mais informações</h3>
+                    
+                    <p>Esperemos que esteja esclarecido e, como mencionado anteriormente, se houver algo que você não tem certeza se precisa ou não, geralmente é mais seguro deixar os cookies ativados, caso interaja com um dos recursos que você usa em nosso site.</p>
+                    
+                    <p class="mt-4 font-medium">Esta política é efetiva a partir de 1 June 2025 17:05</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-feroz-dark text-white pt-10 pb-6">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div>
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-tools text-feroz-yellow text-2xl mr-2"></i>
+                        <h3 class="text-xl font-bold title-font">FEROZ FERRAMENTAS</h3>
+                    </div>
+                    <p class="text-gray-400 mb-4">
+                        Equipamentos de qualidade para profissionais e entusiastas da mecânica.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="https://instagram.com/ferozferramentas" target="_blank" class="text-gray-400 hover:text-feroz-yellow transition duration-300">
+                            <i class="fab fa-instagram text-xl"></i>
+                        </a>
+                        <a href="https://tiktok.com/@ferozferramentas" target="_blank" class="text-gray-400 hover:text-feroz-yellow transition duration-300">
+                            <i class="fab fa-tiktok text-xl"></i>
+                        </a>
+                        <a href="https://youtube.com/@ferozferramentas" target="_blank" class="text-gray-400 hover:text-feroz-yellow transition duration-300">
+                            <i class="fab fa-youtube text-xl"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-bold mb-4 title-font">Links Úteis</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-feroz-yellow transition duration-300" onclick="openInfoModal('sobre-nos-modal'); return false;">Sobre Nós</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-feroz-yellow transition duration-300" onclick="openInfoModal('contato-modal'); return false;">Contato</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-feroz-yellow transition duration-300" onclick="openInfoModal('privacidade-modal'); return false;">Política de Privacidade</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-feroz-yellow transition duration-300" onclick="openInfoModal('termos-uso-modal'); return false;">Termos de Uso</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-bold mb-4 title-font">Informações</h4>
+                    <p class="text-gray-400 mb-4">
+                        Este site utiliza links de afiliado da Shopee, que podem gerar comissões.
+                    </p>
+                    <p class="text-gray-400">
+                        © 2023 Feroz Ferramentas. Todos os direitos reservados.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Sample product data
+        const products = [
+            {
+                id: '506',
+                name: 'Jogo de Chaves Combinadas 12 Peças',
+                category: 'ferramentas',
+                image: 'https://i.imgur.com/gnwmtOX.png',
+                affiliateLink: 'https://mercadolivre.com.br/product/link',
+                marketplace: 'mercadolivre'
+            },
+            {
+                id: '505',
+                name: 'Cera Automotiva Premium',
+                category: 'limpeza',
+                image: 'https://i.imgur.com/uayGPUS.png',
+                affiliateLink: 'https://shopee.com.br/product/link',
+                marketplace: 'shopee'
+            },
+            {
+                id: '504',
+                name: 'Scanner Automotivo OBD2',
+                category: 'acessorios',
+                image: 'https://i.imgur.com/ee71gog.png',
+                affiliateLink: 'https://amazon.com.br/product/link',
+                marketplace: 'amazon'
+            },
+            {
+                id: '503',
+                name: 'Multímetro Digital Automotivo',
+                category: 'acessorios',
+                image: 'https://i.imgur.com/9QvUdam.png',
+                affiliateLink: 'https://shopee.com.br/product/link',
+                marketplace: 'shopee'
+            },
+            {
+                id: '502',
+                name: 'Organizador de Ferramentas',
+                category: 'organizacao',
+                image: 'https://i.imgur.com/BezR8y2.png',
+                affiliateLink: 'https://shopee.com.br/product/link',
+                marketplace: 'shopee'
+            },
+            {
+                id: '501',
+                name: 'Kit Polimento Automotivo',
+                category: 'limpeza',
+                image: 'https://i.imgur.com/YjY1mWx.png',
+                affiliateLink: 'https://mercadolivre.com.br/product/link',
+                marketplace: 'mercadolivre'
+            }
+        ];
+
+        // Function to get marketplace display name
+        function getMarketplaceDisplayName(marketplace) {
+            const marketplaces = {
+                'shopee': 'Shopee',
+                'mercadolivre': 'Mercado Livre',
+                'amazon': 'Amazon',
+                'aliexpress': 'AliExpress',
+                'magalu': 'Magalu',
+                'temu': 'Temu'
+            };
+            return marketplaces[marketplace] || marketplace;
+        }
+
+        // Function to render products
+        function renderProducts(productsToRender) {
+            const productsGrid = document.getElementById('products-grid');
+            productsGrid.innerHTML = '';
+            
+            if (productsToRender.length === 0) {
+                productsGrid.innerHTML = `
+                    <div class="col-span-full text-center py-10">
+                        <i class="fas fa-search text-4xl text-gray-400 mb-3"></i>
+                        <p class="text-xl text-gray-500">Nenhum produto encontrado.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            productsToRender.forEach(product => {
+                const productCard = document.createElement('div');
+                productCard.className = 'product-card bg-white rounded-lg shadow-md overflow-hidden transition duration-300 relative';
+                productCard.setAttribute('data-id', product.id);
+                productCard.setAttribute('data-category', product.category);
+                
+                // Create marketplace badge
+                const marketplaceBadge = `
+                    <span class="marketplace-badge marketplace-${product.marketplace}">
+                        ${getMarketplaceDisplayName(product.marketplace)}
+                    </span>
+                `;
+                
+                productCard.innerHTML = `
+                    ${marketplaceBadge}
+                    <div class="product-card-content h-full">
+                        <div class="product-image-container" onclick="openProductModal('${product.id}')">
+                            <div class="product-image">
+                                <img src="${product.image}" alt="${product.name}" loading="lazy">
+                            </div>
+                        </div>
+                        <div class="p-4 product-info">
+                            <h3 class="text-lg font-bold mb-3 title-font text-feroz-dark">${product.name}</h3>
+                            <div class="product-actions mt-auto">
+                                <p class="product-id text-gray-600 text-sm">ID ${product.id}</p>
+                                <a href="${product.affiliateLink}" target="_blank" class="bg-feroz-yellow hover:bg-yellow-500 text-feroz-dark font-bold py-2 px-4 rounded transition duration-300 block text-center">
+                                    Ver Oferta
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                productsGrid.appendChild(productCard);
+            });
+        }
+
+        // Function to open product modal
+        function openProductModal(productId) {
+            const product = products.find(p => p.id === productId);
+            if (!product) return;
+            
+            const modal = document.getElementById('product-modal');
+            const modalContent = modal.querySelector('.modal-content');
+            
+            // Create marketplace badge
+            const marketplaceBadge = `
+                <span class="marketplace-badge marketplace-${product.marketplace}">
+                    ${getMarketplaceDisplayName(product.marketplace)}
+                </span>
+            `;
+            
+            modalContent.innerHTML = `
+                ${marketplaceBadge}
+                <div class="product-card-content">
+                    <div class="product-image-container" style="cursor: default;">
+                        <div class="product-image">
+                            <img src="${product.image}" alt="${product.name}" loading="lazy">
+                        </div>
+                    </div>
+                    <div class="p-6 product-info">
+                        <h3 class="text-xl font-bold mb-3 title-font text-feroz-dark">${product.name}</h3>
+                        <div class="product-actions">
+                            <p class="product-id text-gray-600 text-base mb-4 text-center">ID ${product.id}</p>
+                            <a href="${product.affiliateLink}" target="_blank" class="bg-feroz-yellow hover:bg-yellow-500 text-feroz-dark font-bold py-3 px-6 rounded transition duration-300 block text-center">
+                                Ver Oferta
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden'; // Prevent scrolling when modal is open
+        }
+
+        // Function to close modal
+        function closeModal(event) {
+            const modal = document.getElementById('product-modal');
+            if (event.target === modal) {
+                modal.classList.remove('active');
+                document.body.style.overflow = ''; // Re-enable scrolling
+            }
+        }
+
+        // Function to open info modals
+        function openInfoModal(modalId) {
+            const modal = document.getElementById(modalId);
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden'; // Prevent scrolling when modal is open
+        }
+
+        // Function to close info modals
+        function closeInfoModal(modalId) {
+            const modal = document.getElementById(modalId);
+            modal.classList.remove('active');
+            document.body.style.overflow = ''; // Re-enable scrolling
+        }
+
+        // Close info modals when clicking outside
+        document.querySelectorAll('.info-modal-overlay').forEach(modal => {
+            modal.addEventListener('click', (event) => {
+                if (event.target === modal) {
+                    modal.classList.remove('active');
+                    document.body.style.overflow = ''; // Re-enable scrolling
+                }
+            });
+        });
+
+        // Initialize with all products
+        document.addEventListener('DOMContentLoaded', () => {
+            renderProducts(products);
+            
+            // Category filtering
+            const categoryButtons = document.querySelectorAll('.category-btn');
+            categoryButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    // Update active state
+                    categoryButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    
+                    const category = button.getAttribute('data-category');
+                    if (category === 'all') {
+                        renderProducts(products);
+                    } else {
+                        const filteredProducts = products.filter(product => product.category === category);
+                        renderProducts(filteredProducts);
+                    }
+                });
+            });
+            
+            // Search functionality
+            const searchInput = document.getElementById('search-input');
+            const searchButton = document.getElementById('search-button');
+            
+            function performSearch() {
+                const searchTerm = searchInput.value.toLowerCase().trim();
+                if (searchTerm === '') {
+                    renderProducts(products);
+                    return;
+                }
+                
+                const filteredProducts = products.filter(product => 
+                    product.name.toLowerCase().includes(searchTerm) || 
+                    product.id.toLowerCase().includes(searchTerm)
+                );
+                
+                renderProducts(filteredProducts);
+            }
+            
+            searchButton.addEventListener('click', performSearch);
+            searchInput.addEventListener('keyup', (e) => {
+                if (e.key === 'Enter') {
+                    performSearch();
+                }
+            });
+            
+            // Scroll to products section when clicking "VER OFERTAS"
+            const verOfertasBtn = document.getElementById('ver-ofertas-btn');
+            verOfertasBtn.addEventListener('click', () => {
+                document.getElementById('produtos-section').scrollIntoView({ behavior: 'smooth' });
+            });
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'949064fe17a2f94d',t:'MTc0ODc5ODU2MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
