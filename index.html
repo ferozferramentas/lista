@@ -710,7 +710,7 @@
 
         // Initialize with all products
         document.addEventListener('DOMContentLoaded', () => {
-            renderProducts(products);
+            fetchProductsFromSheet();
             
             // Category filtering
             const categoryButtons = document.querySelectorAll('.category-btn');
