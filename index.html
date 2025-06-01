@@ -607,7 +607,13 @@ async function loadProductsFromCSV() {
                     <div class="product-card-content h-full">
                         <div class="product-image-container" onclick="openProductModal('${product.id}')">
                             <div class="product-image">
-                                <img src="${product.image}" alt="${product.name}" loading="lazy">
+                                <img  
+				src="${product.image}" 
+    				srcset="${product.image}?w=294 1x, ${product.image}?w=588 2x" 
+    				sizes="(max-width: 768px) 100vw, 294px"
+    				alt="${product.name}" 
+    				loading="lazy"
+    				width="294" height="294">
                             </div>
                         </div>
                         <div class="p-4 product-info">
