@@ -534,56 +534,42 @@
 
     <script>
         // Sample product data
-        const products = [
-            {
-                id: '506',
-                name: 'Jogo de Chaves Combinadas 12 Peças',
-                category: 'ferramentas',
-                image: 'https://i.imgur.com/gnwmtOX.png',
-                affiliateLink: 'https://mercadolivre.com.br/product/link',
-                marketplace: 'mercadolivre'
-            },
-            {
-                id: '505',
-                name: 'Cera Automotiva Premium',
-                category: 'limpeza',
-                image: 'https://i.imgur.com/uayGPUS.png',
-                affiliateLink: 'https://shopee.com.br/product/link',
-                marketplace: 'shopee'
-            },
-            {
-                id: '504',
-                name: 'Scanner Automotivo OBD2',
-                category: 'acessorios',
-                image: 'https://i.imgur.com/ee71gog.png',
-                affiliateLink: 'https://amazon.com.br/product/link',
-                marketplace: 'amazon'
-            },
-            {
-                id: '503',
-                name: 'Multímetro Digital Automotivo',
-                category: 'acessorios',
-                image: 'https://i.imgur.com/9QvUdam.png',
-                affiliateLink: 'https://shopee.com.br/product/link',
-                marketplace: 'shopee'
-            },
-            {
-                id: '502',
-                name: 'Organizador de Ferramentas',
-                category: 'organizacao',
-                image: 'https://i.imgur.com/BezR8y2.png',
-                affiliateLink: 'https://shopee.com.br/product/link',
-                marketplace: 'shopee'
-            },
-            {
-                id: '501',
-                name: 'Kit Polimento Automotivo',
-                category: 'limpeza',
-                image: 'https://i.imgur.com/YjY1mWx.png',
-                affiliateLink: 'https://mercadolivre.com.br/product/link',
-                marketplace: 'mercadolivre'
-            }
-        ];
+
+    async function fetchProductsFromSheet() {
+        const sheetID = "COLE_AQUI_O_ID_DA_PLANILHA";
+        const sheetName = "Página1"; // ou o nome real da aba
+        const url = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:json&sheet=${sheetName}`;
+
+        try {
+            const res = await fetch(url);
+            const text = await res.text();
+            const json = JSON.parse(text.substring(47).slice(0, -2));
+
+            const data = json.table.rows.map(row => {
+                return {
+                    id: row.c[0]?.v || '',
+                    name: row.c[1]?.v || '',
+                    category: row.c[2]?.v || '',
+                    image: row.c[3]?.v || '',
+                    affiliateLink: row.c[4]?.v || '',
+                    marketplace: row.c[5]?.v || ''
+                };
+            });
+
+            renderProducts(data); // já definida no seu código
+        } catch (error) {
+            console.error("Erro ao carregar produtos da planilha:", error);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        fetchProductsFromSheet();
+        // todo o resto do DOMContentLoaded continua aqui
+    });
+</script>
+
+	
+	<script> 
 
         // Function to get marketplace display name
         function getMarketplaceDisplayName(marketplace) {
