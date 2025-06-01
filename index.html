@@ -532,59 +532,34 @@
         </div>
     </footer>
 
+
+
     <script>
         // Sample product data
-        const products = [
-            {
-                id: '506',
-                name: 'Jogo de Chaves Combinadas 12 Peças',
-                category: 'ferramentas',
-                image: 'https://i.imgur.com/gnwmtOX.png',
-                affiliateLink: 'https://mercadolivre.com.br/product/link',
-                marketplace: 'mercadolivre'
-            },
-            {
-                id: '505',
-                name: 'Cera Automotiva Premium',
-                category: 'limpeza',
-                image: 'https://i.imgur.com/uayGPUS.png',
-                affiliateLink: 'https://shopee.com.br/product/link',
-                marketplace: 'shopee'
-            },
-            {
-                id: '504',
-                name: 'Scanner Automotivo OBD2',
-                category: 'acessorios',
-                image: 'https://i.imgur.com/ee71gog.png',
-                affiliateLink: 'https://amazon.com.br/product/link',
-                marketplace: 'amazon'
-            },
-            {
-                id: '503',
-                name: 'Multímetro Digital Automotivo',
-                category: 'acessorios',
-                image: 'https://i.imgur.com/9QvUdam.png',
-                affiliateLink: 'https://shopee.com.br/product/link',
-                marketplace: 'shopee'
-            },
-            {
-                id: '502',
-                name: 'Organizador de Ferramentas',
-                category: 'organizacao',
-                image: 'https://i.imgur.com/BezR8y2.png',
-                affiliateLink: 'https://shopee.com.br/product/link',
-                marketplace: 'shopee'
-            },
-            {
-                id: '501',
-                name: 'Kit Polimento Automotivo',
-                category: 'limpeza',
-                image: 'https://i.imgur.com/YjY1mWx.png',
-                affiliateLink: 'https://mercadolivre.com.br/product/link',
-                marketplace: 'mercadolivre'
-            }
-        ];
+        let products = [];
 
+async function loadProductsFromCSV() {
+    const response = await fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vRrVjBPurEpTebGTF3lUswxcl0Wy_jgrBhRco__Yk7gh9WFX75wDG0sZDjzUBgc1FdMexKUbcD2rvWe/pub?output=csv');
+    const text = await response.text();
+    const rows = text.trim().split('\n').map(row => row.split(','));
+
+    const headers = rows[0];
+    products = rows.slice(1).map(row => {
+        let product = {};
+        headers.forEach((header, i) => {
+            product[header.trim()] = row[i].trim();
+        });
+        return product;
+    });
+
+    renderProducts(products);
+}
+    </script>
+
+
+	
+	<script>
+	    
         // Function to get marketplace display name
         function getMarketplaceDisplayName(marketplace) {
             const marketplaces = {
@@ -724,7 +699,7 @@
 
         // Initialize with all products
         document.addEventListener('DOMContentLoaded', () => {
-            renderProducts(products);
+            loadProductsFromCSV();
             
             // Category filtering
             const categoryButtons = document.querySelectorAll('.category-btn');
